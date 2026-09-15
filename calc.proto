@@ -1,0 +1,62 @@
+// =============================================================================
+// calc.proto — Definição das Mensagens em Protocol Buffers
+// =============================================================================
+// Disciplina : Sistemas Distribuídos
+//
+// O QUE É PROTOCOL BUFFERS (PROTOBUF)?
+// ─────────────────────────────────────────────────────────────────────────────
+// Protocol Buffers é um mecanismo de serialização binária desenvolvido pelo
+// Google. Diferente de formatos textuais como JSON ou XML:
+//
+//   ✔ Mensagens binárias → menor tamanho → menor consumo de banda
+//   ✔ Schema fortemente tipado → menos erros de parse
+//   ✔ Serialização/deserialização muito mais rápida
+//   ✔ Independente de linguagem (suporta Python, Java, C++, Go, etc.)
+//
+// COMO FUNCIONA:
+//   1. Definimos o schema aqui (.proto)
+//   2. O compilador 'protoc' gera código Python (calc_pb2.py)
+//   3. Nosso código usa a classe gerada para serializar/deserializar
+//
+// COMPILAR (gerar calc_pb2.py):
+//   python3 -m grpc_tools.protoc -I. --python_out=. calc.proto
+// =============================================================================
+
+syntax = "proto3";  // Usa a versão 3 do Protocol Buffers (mais moderna)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mensagem de REQUISIÇÃO (cliente → servidor)
+// ─────────────────────────────────────────────────────────────────────────────
+// Equivalente textual: "CALC:<seq>:<op1>:<op>:<op2>"
+//
+// Cada campo tem:
+//   - Tipo     : int32, double, string
+//   - Nome     : identificador do campo
+//   - Número   : tag única usada na serialização binária (NÃO é o valor!)
+// ─────────────────────────────────────────────────────────────────────────────
+message CalcRequest {
+  int32  seq  = 1;  // Número de sequência (identifica a requisição)
+  double op1  = 2;  // Primeiro operando (ponto flutuante 64 bits)
+  string op   = 3;  // Operador: "+", "-", "*" ou "/"
+  double op2  = 4;  // Segundo operando (ponto flutuante 64 bits)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mensagem de RESPOSTA (servidor → cliente)
+// ─────────────────────────────────────────────────────────────────────────────
+// Equivalente textual:
+//   Sucesso: "RESULT:<seq>:<result>"
+//   Erro   : "ERROR:<seq>:<error>"
+//
+// Em proto3, campos não definidos (padrão) têm valor zero:
+//   - int32/double → 0
+//   - string       → ""
+//   - bool         → false
+// Por isso usamos o campo 'ok' para distinguir sucesso de erro.
+// ─────────────────────────────────────────────────────────────────────────────
+message CalcResponse {
+  int32  seq    = 1;  // Eco do número de sequência da requisição
+  bool   ok     = 2;  // true = sucesso | false = erro
+  double result = 3;  // Resultado numérico (válido somente se ok == true)
+  string error  = 4;  // Mensagem de erro (válido somente se ok == false)
+}

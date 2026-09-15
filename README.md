@@ -8,7 +8,5 @@ Repositório com os trabalhos práticos da disciplina de **Sistemas Distribuído
 |-------|-----------|
 | [`trabalho_TCP_UDP/`](./trabalho_TCP_UDP/) | Calculadora remota com UDP, TCP e Protocol Buffers |
 
----
-
-> Curso: Ciência da Computação — UFC  
+--- 
 > Disciplina: Sistemas Distribuídos
